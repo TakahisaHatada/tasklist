@@ -1,10 +1,6 @@
 class TasksController < ApplicationController
   def index
-    if logged_in?
-      @user = current_user
-      @tasks = current_user.tasks.build  # form_for 用
-      @tasks = current_user.tasks.order('created_at DESC').page(params[:page])
-    end
+    @tasks = Task.all
   end
  
   def show
@@ -28,14 +24,27 @@ class TasksController < ApplicationController
   end  
 
   def edit
-    
+    @task = Task.find(params[:id])
   end
   
   def update
+    @task = Task.find(params[:id])
     
+    if @task.update(task_params)
+      flash[:success] = 'Taskは正常に更新されました'
+      redirect_to @task
+    else
+      flash.now[:danger] = 'Taskは更新されませんでした'
+      render :edit
+    end
   end  
 
   def destroy
+    @task = Task.find(params[:id])
+    @task.destroy
+    
+    flash[:success] = 'Taskは正常に削除されました'
+    redirect_to tasks_url
   end
   
   private
